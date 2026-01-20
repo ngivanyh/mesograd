@@ -1,14 +1,15 @@
 from enum import Enum
+from math import tanh, exp
 
 class _Act(Enum):
-    relu = 'ReLU'
-    tanh = 'tanh'
-    sigmoid = 'sigmoid'
+    relu = "ReLU"
+    tanh = "tanh"
+    sigmoid = "sigmoid"
 
 class Value:
     """ stores a single scalar value and its gradient """
 
-    def __init__(self, data, _children=(), _op='', _act:_Act=_Act.relu):
+    def __init__(self, data:int|float, _children=(), _op:str='', _act:_Act=_Act.relu):
         self.data = data
         self.grad = 0
         # internal variables used for autograd graph construction
@@ -57,8 +58,43 @@ class Value:
         out._backward = _backward
 
         return out
+    
+    def _relu(self):
+        out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
+
+        def _backward():
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _backward
+
+        return out
+    
+    def _tanh(self):
+        out = Value(tanh(self.data), (self,), "tanh")
+        
+        def _backward():
+            self.grad += 0
+        out._backward = _backward
+        
+        return out
+    
+    def _sigmoid(self):
+        out = Value(1 / 1 + exp(-self.data), (self,), "Sigmoid")
+        
+        def _backward():
+            self.grad += 0
+        out._backward = _backward
+        
+        return out
+    
     def act(self):
-        pass
+        # activation function, defaults to ReLU
+        match self._act.value:
+            case "tanh":
+                return self._tanh()
+            case "sigmoid":
+                return self._sigmoid
+            case _:
+                return self._relu()
 
     def backward(self):
         # topological order all of the children in the graph
