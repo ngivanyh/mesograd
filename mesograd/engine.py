@@ -1,14 +1,21 @@
+from enum import Enum
+
+class _Act(Enum):
+    relu = 'ReLU'
+    tanh = 'tanh'
+    sigmoid = 'sigmoid'
 
 class Value:
     """ stores a single scalar value and its gradient """
 
-    def __init__(self, data, _children=(), _op=''):
+    def __init__(self, data, _children=(), _op='', _act:_Act=_Act.relu):
         self.data = data
         self.grad = 0
         # internal variables used for autograd graph construction
         self._backward = lambda: None
         self._prev = set(_children)
         self._op = _op # the op that produced this node, for graphviz / debugging / etc
+        self._act = _act
 
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)
@@ -50,9 +57,10 @@ class Value:
         out._backward = _backward
 
         return out
+    def act(self):
+        pass
 
     def backward(self):
-
         # topological order all of the children in the graph
         topo = []
         visited = set()
