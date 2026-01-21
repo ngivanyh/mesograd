@@ -141,7 +141,7 @@ class Value:
 class Tensor:
     """extends the Value object and groups them into a Tensor"""
 
-    def __init__(self, dimensions: Tuple[int, int]=(1,1), data, _children=(), _op:str='', _act:_Act=_Act.relu):
+    def __init__(self, dimensions: Tuple[int, int]=(1,1), data: int|float, _children=(), _op:str='', _act:_Act=_Act.relu):
         pass
     
     def backward(self):
