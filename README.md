@@ -36,28 +36,6 @@ The notebook `demo.ipynb` provides a full demo of training an 2-layer neural net
 
 ![2d neuron](moon_mlp.png)
 
-### Tracing / visualization
-
-For added convenience, the notebook `trace_graph.ipynb` produces graphviz visualizations. E.g. this one below is of a simple 2D neuron, arrived at by calling `draw_dot` on the code below, and it shows both the data (left number in each node) and the gradient (right number in each node).
-
-```python
-from micrograd import nn
-n = nn.Neuron(2)
-x = [Value(1.0), Value(-2.0)]
-y = n(x)
-dot = draw_dot(y)
-```
-
-![2d neuron](gout.svg)
-
-### Running tests
-
-To run the unit tests you will have to install [PyTorch](https://pytorch.org/), which the tests use as a reference for verifying the correctness of the calculated gradients. Then simply:
-
-```bash
-python -m pytest
-```
-
 ### License
 
 Original Work: Copyright (c) Andrej Karpathy, [MIT License](LICENSE-ORIGINAL)
