@@ -1,5 +1,8 @@
 
-# mesograd
+# `mesograd`
+
+> [!NOTE]
+> This project is under work, please see the [roadmap](roadmap.md)
 
 ![awww](puppy.jpg)
 
