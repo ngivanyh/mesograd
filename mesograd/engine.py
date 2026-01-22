@@ -5,7 +5,8 @@ from typing import Tuple
 class _Act(Enum):
     relu = "ReLU"
     tanh = "tanh"
-    sigmoid = "sigmoid"
+    sigmoid = "Sigmoid"
+    linear = "Linear"
 
 class Value:
     """ stores a single scalar value and its gradient """
@@ -88,14 +89,16 @@ class Value:
         return out
     
     def act(self):
-        # activation function, defaults to ReLU
+        # activation function, default set to ReLU, linear if something happens to self._act.value 
         match self._act.value:
             case "tanh":
                 return self._tanh()
-            case "sigmoid":
+            case "Sigmoid":
                 return self._sigmoid
-            case _:
+            case "ReLU":
                 return self._relu()
+            case _:
+                return self
 
     def backward(self):
         # topological order all of the children in the graph
@@ -142,7 +145,9 @@ class Tensor:
     """extends the Value object and groups them into a Tensor"""
 
     def __init__(self, data: int|float, dimensions: Tuple[int, int]=(1,1), _children=(), _op:str='', _act:_Act=_Act.relu):
-        pass
+        self._children = set(_children)
+        self._backward = lambda: None
+        self._op = _op
     
     def backward(self):
         pass

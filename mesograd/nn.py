@@ -1,5 +1,5 @@
 import random
-from mesograd.engine import Value
+from mesograd.engine import Value, _Act
 
 class Module:
 
@@ -11,23 +11,29 @@ class Module:
         return []
 
 class Neuron(Module):
+    """a single neuron"""
 
-    def __init__(self, nin, nonlin=True):
+    def __init__(self, nin, nonlin=True, _act: _Act=_Act.relu):
         self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
         self.b = Value(0)
         self.nonlin = nonlin
+        if not nonlin:
+            self._act = _Act.linear
+        else:
+            self._act = _act
 
     def __call__(self, x):
         act = sum((wi*xi for wi,xi in zip(self.w, x)), self.b)
-        return act.relu() if self.nonlin else act
+        return act.act() if self.nonlin else act
 
     def parameters(self):
         return self.w + [self.b]
 
     def __repr__(self):
-        return f"{'ReLU' if self.nonlin else 'Linear'}Neuron({len(self.w)})"
+        return f"{self._act.value if self.nonlin else 'Linear'}Neuron({len(self.w)})"
 
 class Layer(Module):
+    """a layer of neurons"""
 
     def __init__(self, nin, nout, **kwargs):
         self.neurons = [Neuron(nin, **kwargs) for _ in range(nout)]
@@ -43,6 +49,7 @@ class Layer(Module):
         return f"Layer of [{', '.join(str(n) for n in self.neurons)}]"
 
 class MLP(Module):
+    """a multi-layer perceptron, made up of mulitple layers (each with neurons)"""
 
     def __init__(self, nin, nouts):
         sz = [nin] + nouts
