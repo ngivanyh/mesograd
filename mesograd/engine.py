@@ -52,15 +52,6 @@ class Value:
 
         return out
 
-    def relu(self):
-        out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
-
-        def _backward():
-            self.grad += (out.data > 0) * out.grad
-        out._backward = _backward
-
-        return out
-    
     def _relu(self):
         out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
 
@@ -69,32 +60,34 @@ class Value:
         out._backward = _backward
 
         return out
-    
+
     def _tanh(self):
         out = Value(tanh(self.data), (self,), "tanh")
-        
+
         def _backward():
-            self.grad += 0
+            # 1 - tanh(x)^2
+            self.grad += (1 - out.data**2) * out.grad
         out._backward = _backward
-        
+
         return out
-    
+
     def _sigmoid(self):
-        out = Value(1 / 1 + exp(-self.data), (self,), "Sigmoid")
-        
+        out = Value(1 / (1 + exp(-self.data)), (self,), "Sigmoid")
+
         def _backward():
-            self.grad += 0
+            # σ(x)*σ(1 - x)
+            self.grad += (out.data * (1 - out.data)) * out.grad
         out._backward = _backward
-        
+
         return out
-    
+
     def act(self):
-        # activation function, default set to ReLU, linear if something happens to self._act.value 
+        # activation function, default set to ReLU, linear if something happens to self._act.value
         match self._act.value:
             case "tanh":
                 return self._tanh()
             case "Sigmoid":
-                return self._sigmoid
+                return self._sigmoid()
             case "ReLU":
                 return self._relu()
             case _:
@@ -105,11 +98,14 @@ class Value:
         topo = []
         visited = set()
         def build_topo(v):
-            if v not in visited:
-                visited.add(v)
-                for child in v._prev:
-                    build_topo(child)
-                topo.append(v)
+            if v in visited:
+                return
+            # v is not in visited
+            visited.add(v)
+            for child in v._prev:
+                build_topo(child)
+            topo.append(v)
+
         build_topo(self)
 
         # go one variable at a time and apply the chain rule to get its gradient
@@ -141,13 +137,13 @@ class Value:
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"
 
-class Tensor:
-    """extends the Value object and groups them into a Tensor"""
+class Matrix:
+    """"""
 
     def __init__(self, data: int|float, dimensions: Tuple[int, int]=(1,1), _children=(), _op:str='', _act:_Act=_Act.relu):
         self._children = set(_children)
         self._backward = lambda: None
         self._op = _op
-    
+
     def backward(self):
         pass

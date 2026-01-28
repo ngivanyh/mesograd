@@ -1,5 +1,12 @@
-from mesograd.engine import Value
+from mesograd.engine import Value, _Act
 
-val = Value(1)
+a = Value(0.4)
+b = Value(0.2)
 
-print(val.act())
+c = a + b
+c._act = _Act.sigmoid
+d = c.act()
+
+d.backward()
+
+print(f"sigmoid({a} + {b}) = {d}")

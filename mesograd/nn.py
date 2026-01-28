@@ -17,10 +17,7 @@ class Neuron(Module):
         self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
         self.b = Value(0)
         self.nonlin = nonlin
-        if not nonlin:
-            self._act = _Act.linear
-        else:
-            self._act = _act
+        self._act = _Act.linear if not nonlin else _act
 
     def __call__(self, x):
         act = sum((wi*xi for wi,xi in zip(self.w, x)), self.b)
