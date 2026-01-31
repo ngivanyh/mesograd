@@ -1,5 +1,5 @@
 import random
-from mesograd.engine import Value, _Act
+from mesograd.engine import Scalar, _Act
 
 class Module:
 
@@ -14,8 +14,8 @@ class Neuron(Module):
     """a single neuron"""
 
     def __init__(self, nin, nonlin=True, _act: _Act=_Act.relu):
-        self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
-        self.b = Value(0)
+        self.w = [Scalar(random.uniform(-1,1)) for _ in range(nin)]
+        self.b = Scalar(0)
         self.nonlin = nonlin
         self._act = _Act.linear if not nonlin else _act
 
